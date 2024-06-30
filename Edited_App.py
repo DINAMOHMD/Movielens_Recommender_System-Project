@@ -14,17 +14,17 @@ tmdb.api_key = TMDB_API_KEY
 movie_api = Movie()
 
 # Load KNN model and data 
-with open(r'D:\ITI\Recommender\project\KNN_model.pkl', 'rb') as f:
+with open(r'KNN_model.pkl', 'rb') as f:
     KNN = pickle.load(f)
 
-with open(r'D:\ITI\Recommender\project\data.pkl', 'rb') as f:
+with open(r'data.pkl', 'rb') as f:
     X_reduced, movie_mapper, movie_inv_mapper, movie_titles = pickle.load(f)
 
 # Load predictions and model 
-predictions = pickle.load(open(r'D:\ITI\Recommender\project\all_prediction.Sav', 'rb'))
+predictions = pickle.load(open(r'all_prediction.Sav', 'rb'))
 
 #Load image for UI 
-img = Image.open(r"D:\ITI\Recommender\project\image_processing20210415-22559-wpekzo-removebg.png")
+img = Image.open(r"image_processing20210415-22559-wpekzo-removebg.png")
 
 def find_similar_movies(movie_title, k=10):
     try:
