@@ -34,6 +34,10 @@ This project is a movie recommendation system using the MovieLens dataset. It em
 - **User Recommender**: Factorization Machines, Neural Collaborative Filtering, etc.
 - **Item Similarity**: Calculated on demand when an item is selected.
 
-
+## Dependencies
+_ all required packages in `requirements.txt` please run this : 
+```bash
+pip install -r requirements.txt
+```
 
 
