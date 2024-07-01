@@ -14,14 +14,14 @@ tmdb.api_key = TMDB_API_KEY
 movie_api = Movie()
 
 # Load KNN model and data 
-with open(r'KNN_model.pkl', 'rb') as f:
+with open(r'/mount/src/movielens_recommender_system-project/KNN_model.pkl', 'rb') as f:
     KNN = pickle.load(f)
 
-with open(r'data.pkl', 'rb') as f:
+with open(r'/mount/src/movielens_recommender_system-project/data.pkl', 'rb') as f:
     X_reduced, movie_mapper, movie_inv_mapper, movie_titles = pickle.load(f)
 
 # Load predictions and model 
-predictions = pickle.load(open(r'all_prediction.Sav', 'rb'))
+predictions = pickle.load(open(r'/mount/src/movielens_recommender_system-project/all_prediction.Sav', 'rb'))
 
 #Load image for UI 
 img = Image.open(r"image_processing20210415-22559-wpekzo-removebg.png")
