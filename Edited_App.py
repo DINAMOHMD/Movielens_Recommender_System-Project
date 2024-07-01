@@ -14,20 +14,20 @@ tmdb.api_key = TMDB_API_KEY
 movie_api = Movie()
 
 # Load KNN model and data 
-with open(r'D:\ITI\Recommender\project\KNN_model.pkl', 'rb') as f:
+with open(r'/mount/src/movielens_recommender_system-project/KNN_model.pkl', 'rb') as f:
     KNN = pickle.load(f)
 
-with open(r'D:\ITI\Recommender\project\data.pkl', 'rb') as f:
+with open(r'/mount/src/movielens_recommender_system-project/data.pkl', 'rb') as f:
     X_reduced, movie_mapper, movie_inv_mapper, movie_titles = pickle.load(f)
 
-movies_links = pd.read_csv(r'D:\ITI\Recommender\project\ml-latest-small\links.csv') 
+movies_links = pd.read_csv(r'/mount/src/movielens_recommender_system-project/DataSet/links.csv') 
 movie_id_mapping = dict(zip(movies_links['movieId'], movies_links['tmdbId']))
 
 # Load predictions and model 
-predictions = pickle.load(open(r'D:\ITI\Recommender\project\all_prediction.Sav', 'rb'))
+predictions = pickle.load(open(r'/mount/src/movielens_recommender_system-project/all_prediction.Sav', 'rb'))
 
 #Load image for UI 
-img = Image.open(r"D:\ITI\Recommender\project\image_processing20210415-22559-wpekzo-removebg.png")
+img = Image.open(r"/mount/src/movielens_recommender_system-project/image_processing20210415-22559-wpekzo-removebg.png")
 
 def find_similar_movies(movie_title, k=10):
     # movie_id = movie_titles.get(movie_title)
