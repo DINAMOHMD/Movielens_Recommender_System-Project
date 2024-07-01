@@ -14,20 +14,38 @@ tmdb.api_key = TMDB_API_KEY
 movie_api = Movie()
 
 # Load KNN model and data 
-with open(r'KNN_model.pkl', 'rb') as f:
+with open(r'/mount/src/movielens_recommender_system-project/KNN_model.pkl', 'rb') as f:
     KNN = pickle.load(f)
 
-with open(r'data.pkl', 'rb') as f:
+with open(r'/mount/src/movielens_recommender_system-project/data.pkl', 'rb') as f:
     X_reduced, movie_mapper, movie_inv_mapper, movie_titles = pickle.load(f)
 
+movies_links = pd.read_csv(r'/mount/src/movielens_recommender_system-project/DataSet/links.csv') 
+movie_id_mapping = dict(zip(movies_links['movieId'], movies_links['tmdbId']))
+
 # Load predictions and model 
-predictions = pickle.load(open(r'all_prediction.Sav', 'rb'))
+predictions = pickle.load(open(r'/mount/src/movielens_recommender_system-project/all_prediction.Sav', 'rb'))
 
 #Load image for UI 
-img = Image.open(r"image_processing20210415-22559-wpekzo-removebg.png")
+img = Image.open(r"/mount/src/movielens_recommender_system-project/image_processing20210415-22559-wpekzo-removebg.png")
 
 def find_similar_movies(movie_title, k=10):
+    # movie_id = movie_titles.get(movie_title)
+    # try:
+    #     tmdb_id = movie_id_mapping.get(movie_id)
+    #     if not tmdb_id:
+    #         return []
+
+    #     movie_vec = X_reduced[movie_mapper[tmdb_id]].reshape(1, -1)
+    #     neighbours = KNN.kneighbors(movie_vec, return_distance=False)
+    #     neighbour_ids = [movie_inv_mapper[n] for n in neighbours[0] if n != movie_mapper[tmdb_id]][:k]
+    #     return neighbour_ids
+    # except Exception as e:
+    #     print(f"Error finding similar movies: {e}")
+    #     return []
+    
     try:
+
         search_results = movie_api.search(movie_title)
 
         if len(search_results) == 0:
@@ -42,6 +60,8 @@ def find_similar_movies(movie_title, k=10):
         else:
             # If no exact match, take the first result as a fallback
             movie_id = search_results[0].id
+
+        
 
         movie_ind = movie_mapper.get(movie_id)
         if movie_ind is None:
@@ -72,31 +92,29 @@ def get_recommendations(user_id, top_k = 10):
 def normalize_title(movie_title):
     return movie_title.split(' (')[0].strip()   
 
-def fetch_poster(movie_id):
+def fetch_poster(tmdb_id):
     try:
-        response = requests.get(f'https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}')
-        if response.status_code == 200:
-            data = response.json()
-            poster_path = data.get('poster_path')
-            if poster_path:
-                full_path = 'https://image.tmdb.org/t/p/w500/' + poster_path
-                return full_path
-            else:
-                return "https://via.placeholder.com/500x750?text=No+Image+Available"
+        movie = movie_api.details(tmdb_id)
+        poster_path = movie.poster_path
+        if poster_path:
+            poster_url = f'https://image.tmdb.org/t/p/w500/{poster_path}'
+            return poster_url
         else:
             return "https://via.placeholder.com/500x750?text=No+Image+Available"
     except Exception as e:
-        st.write(f"Error fetching poster for movie ID {movie_id}: {e}")
-        return "https://via.placeholder.com/500x750?text=Error+Fetching+Image"
+        return f"https://via.placeholder.com/500x750?text=Error:+{e}"
    
-def fetch_movie_title(movie_id):
+   
+def fetch_movie_title(tmdb_id):
 
     try:
-        response = requests.get(f'https://api.themoviedb.org/3/movie/{movie_id}?api_key={API_KEY_AUTH}')
+        
+        response = requests.get(f'https://api.themoviedb.org/3/movie/{tmdb_id}?api_key={TMDB_API_KEY}')
         if response.status_code == 200:
             data = response.json()
             title = data.get('title', 'Unknown Title')
             return title
+        
         else:
             return None  # Return None if status code is not 200
     except:
@@ -124,21 +142,21 @@ header {visibility: hidden;}
 '''
 st.markdown(hide_decoration_bar_style, unsafe_allow_html=True)
 
-def show_posters(num , similar_movies):
+def show_posters(num, movie_ids):
     num_cols = 3
-    num_movies = similar_movies[:num]
+    num_movies = movie_ids[:num]
     num_rows = (len(num_movies) // num_cols) + (1 if len(num_movies) % num_cols > 0 else 0)
     for row in range(num_rows):
-                        cols = st.columns(num_cols)
-                        for col in range(num_cols):
-                            index = row * num_cols + col
-                            if index < len(num_movies):
-                                movie_id = num_movies[index]
-                                poster_url = fetch_poster(movie_id)
-                                movie_title = movie_titles.get(movie_id, "Unknown")
-                                cols[col].image(poster_url, caption=movie_title)
-
-
+        cols = st.columns(num_cols)
+        for col in range(num_cols):
+            index = row * num_cols + col
+            if index < len(num_movies):
+                movie_id = num_movies[index]
+                tmdb_id = movie_id_mapping.get(movie_id)
+                poster_url = fetch_poster(tmdb_id)
+                # movie_title = movie_titles.get(movie_id, "Unknown")
+                movie_title = fetch_movie_title(tmdb_id)
+                cols[col].image(poster_url, caption=movie_title)
 
 # Main page 
 def home_page():
